@@ -42,14 +42,13 @@ func QueryByModel(db *sql.DB, model interface{}, tableName string, pageCondition
 	return
 }
 
-
 //适合连表查询
 //sqlStr sql查询语句
 //sqlAfterFrom sql语句查询的表名和条件
 //targetModel 查询结果封装到的目标对象
-func QueryBySql(db *sql.DB, sqlStr string,sqlAfterFrom string,pageCondition *models.PageQueryCondition,targetModel interface{}) (pageInfo *models.PageInfo) {
+func QueryBySql(db *sql.DB, sqlStr string, sqlAfterFrom string, pageCondition *models.PageQueryCondition, targetModel interface{}) (pageInfo *models.PageInfo) {
 	pageInfo = GetPageInfo(db, sqlAfterFrom, pageCondition)
-	result := SelectBySql(db,sqlStr,pageCondition,targetModel)
+	result := SelectBySql(db, sqlStr, pageCondition, targetModel)
 	pageInfo.ListData = result
 	pageInfo.Size = len(result)
 	return
@@ -81,13 +80,13 @@ func SelectByModel(db *sql.DB, model interface{}, tableName string, pageConditio
 	}
 	log.Println(sqlStr)
 	rows, err := db.Query(sqlStr)
-	defer  rows.Close()
+	defer rows.Close()
 	if logError(err) {
 		columns, err := rows.Columns()
 		clen := len(columns)
 		if logError(err) {
 			for rows.Next() {
-				midv := SetValue(clen,rtype,rows,columns)
+				midv := SetValue(clen, rtype, rows, columns)
 				result = append(result, midv)
 			}
 		}
@@ -95,9 +94,7 @@ func SelectByModel(db *sql.DB, model interface{}, tableName string, pageConditio
 	return
 }
 
-
-
-func SelectBySql(db *sql.DB, sqlStr string ,pageCondition *models.PageQueryCondition,targetModel interface{})(result []interface{}){
+func SelectBySql(db *sql.DB, sqlStr string, pageCondition *models.PageQueryCondition, targetModel interface{}) (result []interface{}) {
 	rtype := reflect.TypeOf(targetModel)
 	if rtype.Kind() == reflect.Ptr {
 		rtype = rtype.Elem()
@@ -112,13 +109,13 @@ func SelectBySql(db *sql.DB, sqlStr string ,pageCondition *models.PageQueryCondi
 	}
 	log.Println(sqlStr)
 	rows, err := db.Query(sqlStr)
-	defer  rows.Close()
+	defer rows.Close()
 	if logError(err) {
 		columns, err := rows.Columns()
 		clen := len(columns)
 		if logError(err) {
 			for rows.Next() {
-				midv := SetValue(clen,rtype,rows,columns)
+				midv := SetValue(clen, rtype, rows, columns)
 				result = append(result, midv)
 			}
 		}
@@ -127,7 +124,7 @@ func SelectBySql(db *sql.DB, sqlStr string ,pageCondition *models.PageQueryCondi
 }
 
 //封装查询结果
-func SetValue(clen int,rtype reflect.Type,row *sql.Rows,columns []string) (result interface{}) {
+func SetValue(clen int, rtype reflect.Type, row *sql.Rows, columns []string) (result interface{}) {
 	values := make([]interface{}, clen)
 	scanArgs := make([]interface{}, clen)
 	midModel := reflect.New(rtype)
@@ -171,28 +168,6 @@ func SetValue(clen int,rtype reflect.Type,row *sql.Rows,columns []string) (resul
 	return
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //传指针是为了合理化页码
 func GetPageInfo(db *sql.DB, tableName string, pageCondition *models.PageQueryCondition) (pageInfo *models.PageInfo) {
 
@@ -201,7 +176,7 @@ func GetPageInfo(db *sql.DB, tableName string, pageCondition *models.PageQueryCo
 
 	count := 0
 	rows, err := db.Query(sqlCount)
-	defer  rows.Close()
+	defer rows.Close()
 	if logError(err) {
 		for rows.Next() {
 			rows.Scan(&count)
@@ -209,12 +184,12 @@ func GetPageInfo(db *sql.DB, tableName string, pageCondition *models.PageQueryCo
 	}
 	//设置默页数
 	if pageCondition.PageNum <= 0 {
-		log.Printf("pageNum: %s is invalid ",pageCondition.PageNum)
+		log.Printf("pageNum: %s is invalid ", pageCondition.PageNum)
 		pageCondition.PageNum = 1
 	}
 	//设置默认的页面大小
 	if pageCondition.PageSize <= 0 {
-		log.Printf("pageSize: %s is invalid ",pageCondition.PageSize)
+		log.Printf("pageSize: %s is invalid ", pageCondition.PageSize)
 		pageCondition.PageSize = 15
 	}
 
